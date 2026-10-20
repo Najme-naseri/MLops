@@ -16,11 +16,9 @@ docker compose up -d seaweedfs
 docker compose ps
 cd ~/work/churn-mlops
 cp ~/mlops-lab/compose/.env.example .env
-cat >> .env <<'ENV'
-AWS_ACCESS_KEY_ID=$S3_ACCESS_KEY
-AWS_SECRET_ACCESS_KEY=$S3_SECRET_KEY
-S3_ENDPOINT_URL=http://localhost:8333
-ENV
+# Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in .env
+# using your lab credentials; never commit .env.
+# Ensure S3_ENDPOINT_URL=http://localhost:8333 is set in .env.
 set -a
 source .env
 set +a

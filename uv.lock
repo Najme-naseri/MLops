@@ -64,7 +64,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "awscli", specifier = ">=1.46.1" },
+    { name = "awscli", specifier = "==1.46.1" },
     { name = "pre-commit", specifier = ">=4.7.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "ruff", specifier = ">=0.17.1" },
