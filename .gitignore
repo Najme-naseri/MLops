@@ -4,3 +4,4 @@ metrics.json
 .venv/
 __pycache__/
 data/raw/churn.csv
+.env
