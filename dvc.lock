@@ -36,12 +36,12 @@ stages:
     params:
       params.yaml:
         train:
-          C: 1.0
+          C: 10
           max_iter: 500
     outs:
     - path: models/model.joblib
       hash: md5
-      md5: 67705c7eb8badd9efebfa608f28cf367
+      md5: cd639dbffab5adc6ce08657886d6aee8
       size: 3921
   evaluate:
     cmd: uv run python -m churn.evaluate
@@ -52,17 +52,17 @@ stages:
       size: 64366
     - path: models/model.joblib
       hash: md5
-      md5: 67705c7eb8badd9efebfa608f28cf367
+      md5: cd639dbffab5adc6ce08657886d6aee8
       size: 3921
     - path: src/churn/evaluate.py
       hash: md5
-      md5: cef5bf143d2c62fc84ab73a8d66044d8
-      size: 3133
+      md5: 19689145d9a791e48b9591bb04f8525e
+      size: 10768
     params:
       params.yaml:
         eval.threshold: 0.5
     outs:
     - path: metrics.json
       hash: md5
-      md5: b2324eca594271a85e16fb1a91bcafda
+      md5: 2138d98aded26528a87cb44d45e66021
       size: 39
