@@ -25,3 +25,9 @@ set +a
 uv run aws --endpoint-url "$S3_ENDPOINT_URL" s3 mb s3://dvc
 uv run aws --endpoint-url "$S3_ENDPOINT_URL" s3 mb s3://mlflow
 make s3-ls
+## Contributing
+
+- **Branch naming:** Use `feature/...` for new features, `fix/...` for bug fixes, and `docs/...` for documentation changes.
+- **Commit messages:** Follow [Conventional Commits](https://www.conventionalcommits.org/), e.g. `feat: add churn rate test`.
+- **Pull Requests:** Ensure all tests pass, include before-and-after metrics in the description, and never commit datasets, trained models, or secrets/passwords.
+- **Before pushing:** Run `make lint` and `make test` and make sure both commands pass.
