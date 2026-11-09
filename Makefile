@@ -1,8 +1,9 @@
 # This Makefile holds shortcuts; in Session 6 a new target, `runs`, is added.
 # Warning: recipe lines (the commands) must start with a TAB character, not spaces.
+SHELL := /bin/bash
 
 # These are names of jobs, not files; .PHONY makes make always run them.
-.PHONY: data train lint test runs
+.PHONY: data train lint test runs s3-ls
 
 # Create the synthetic data in data/raw/churn.csv (versioned with DVC in Session 4).
 data:
@@ -25,3 +26,6 @@ test:
 # Print a table of the runs of the experiment named churn in the terminal (newest first).
 runs:
 	uv run python scripts/list_runs.py
+s3-ls:
+	@set -a; source ~/work/churn-mlops/.env; set +a; \
+	uv run aws --endpoint-url "$$S3_ENDPOINT_URL" s3 ls
