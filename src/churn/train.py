@@ -33,7 +33,12 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from churn.preprocess import OUT_DIR, TARGET
 
 
-def build_model(X: pd.DataFrame, C: float, max_iter: int) -> Pipeline:
+def build_model(
+    X: pd.DataFrame,
+    C: float,
+    max_iter: int,
+    class_weight: str | None = None,
+) -> Pipeline:
     """Build (but do not fit) the preprocessing + logistic regression Pipeline.
 
     The model is a two-step Pipeline. Step one standardizes the numeric columns and one-hot
@@ -46,6 +51,7 @@ def build_model(X: pd.DataFrame, C: float, max_iter: int) -> Pipeline:
         C: inverse regularization strength (smaller = more careful model); from params.yaml.
         max_iter: max optimizer iterations; from params.yaml.
 
+        class_weight: Class weighting strategy; None preserves the original behavior.
     Returns:
         An unfitted `Pipeline`.
     """
@@ -61,7 +67,19 @@ def build_model(X: pd.DataFrame, C: float, max_iter: int) -> Pipeline:
             ("cat", OneHotEncoder(handle_unknown="ignore"), cat),
         ]
     )
-    return Pipeline([("pre", pre), ("clf", LogisticRegression(C=C, max_iter=max_iter))])
+    return Pipeline(
+        [
+            ("pre", pre),
+            (
+                "clf",
+                LogisticRegression(
+                    C=C,
+                    max_iter=max_iter,
+                    class_weight=class_weight,
+                ),
+            ),
+        ]
+    )
 
 
 def main(config: str) -> None:
