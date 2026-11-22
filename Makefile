@@ -3,7 +3,7 @@
 SHELL := /bin/bash
 
 # These are names of jobs, not files; .PHONY makes make always run them.
-.PHONY: data train lint test runs s3-ls
+.PHONY: data train lint test runs s3-ls data-pull data-status
 
 # Create the synthetic data in data/raw/churn.csv (versioned with DVC in Session 4).
 data:
@@ -29,3 +29,10 @@ runs:
 s3-ls:
 	@set -a; source ~/work/churn-mlops/.env; set +a; \
 	uv run aws --endpoint-url "$$S3_ENDPOINT_URL" s3 ls
+# Pull versioned data from the DVC remote.
+data-pull:
+	uv run dvc pull
+
+# Show the status of the local DVC cache compared with the remote.
+data-status:
+	uv run dvc status --cloud
