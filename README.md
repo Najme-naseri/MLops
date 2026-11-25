@@ -66,3 +66,34 @@ The `train.class_weight` parameter was evaluated using DVC Experiments. All expe
 | `class_weight: balanced` | `train` (`evaluate` skipped) | 0.7493 | 0.6849 |
 
 The `null` value was selected because it achieved a higher F1 score (0.6987) while keeping ROC-AUC unchanged at 0.7493. F1 was sensitive to the class-weight setting, whereas ROC-AUC remained stable. Since the dataset, test split, and random seed were identical across experiments, the results are comparable.
+## Parameter Comparison
+
+### DVC Params Diff
+
+```text
+Path         Param    v0.3.0    workspace
+params.yaml  train.C  1.0       10
+```
+
+### DVC Metrics Diff
+
+```text
+Path          Metric    v0.3.0    workspace    Change
+metrics.json  f1        0.6991    0.6987       -0.0004
+```
+
+## Experiments
+
+The `train.class_weight` parameter was evaluated using DVC Experiments. All experiments used the same dataset, random seed (`42`), test size (`0.2`), and evaluation threshold (`0.5`).
+
+| Parameter and value | Stages rerun | roc_auc | f1 |
+|---|---|---:|---:|
+| Baseline (`balanced`) | — | 0.7493 | 0.6849 |
+| `class_weight: null` | `train` | 0.7493 | 0.6987 |
+| `class_weight: balanced` | `train` | 0.7493 | 0.6849 |
+
+The `null` value was selected because it achieved a higher F1 score (0.6987) while keeping ROC-AUC unchanged at 0.7493. F1 was sensitive to the class-weight setting, whereas ROC-AUC remained stable. Since the dataset, test split, and random seed were identical across experiments, the results are comparable.
+
+## Pipeline Re-execution
+
+Only the `train` stage was rerun because `train.class_weight` is a parameter used by that stage. The `preprocess` stage was skipped because its parameters and dependencies had not changed, and `evaluate` was restored from cache because its inputs had not changed.
