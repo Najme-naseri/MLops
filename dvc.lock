@@ -39,10 +39,12 @@ stages:
           C: 10
           max_iter: 500
           class_weight:
+            0: 1
+            1: 2
     outs:
     - path: models/model.joblib
       hash: md5
-      md5: cd639dbffab5adc6ce08657886d6aee8
+      md5: e3a6ba2da2cfcee3c9256002c91504fc
       size: 3921
   evaluate:
     cmd: uv run python -m churn.evaluate
@@ -53,7 +55,7 @@ stages:
       size: 64366
     - path: models/model.joblib
       hash: md5
-      md5: cd639dbffab5adc6ce08657886d6aee8
+      md5: e3a6ba2da2cfcee3c9256002c91504fc
       size: 3921
     - path: src/churn/evaluate.py
       hash: md5
@@ -65,5 +67,5 @@ stages:
     outs:
     - path: metrics.json
       hash: md5
-      md5: aa971f64a4fc824d7de5ba6b0a64845a
-      size: 82
+      md5: a39f1a36da50542e7919360864556120
+      size: 81
