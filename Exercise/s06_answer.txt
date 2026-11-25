@@ -1,0 +1,1 @@
+Some `dvc repro` or `dvc exp run` executions did not create new MLflow runs because the corresponding pipeline stages were cached. As a result, the training or evaluation code was not executed again, so no new MLflow run was logged.
