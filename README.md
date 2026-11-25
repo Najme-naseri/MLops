@@ -55,3 +55,14 @@ The following failures were intentionally reproduced to verify the DVC remote co
 |---|---|---|---|
 | Changed the DVC `endpointurl` from port `8333` to the incorrect port `8334` and ran `uv run dvc push`. | `ERROR: unexpected error - Could not connect to the endpoint URL: "http://localhost:8334/dvc/store/files/md5/06/910cf17d38a01ab3ead6e70bec63a2.dir"` | DVC cannot connect to the S3-compatible SeaweedFS service because the configured endpoint port is incorrect. | Restore the endpoint to `http://localhost:8333` (or the value of `S3_ENDPOINT_URL` in `.env`). |
 | Removed the local `access_key_id` with `uv run dvc remote modify --local storage --unset access_key_id` and ran `uv run dvc pull`. | `ERROR: failed to connect to s3 (dvc/store/files/md5) - Partial credentials found in explicit, missing: aws_access_key_id` followed by `ERROR: failed to pull data from the cloud - 5 files failed to download` | DVC has a secret key configured but no AWS access key, so the S3 credentials are incomplete. | Restore the access key from the local `.env` using `uv run dvc remote modify --local storage access_key_id "$AWS_ACCESS_KEY_ID"`. |
+## Experiments
+
+The `train.class_weight` parameter was evaluated using DVC Experiments. All experiments used the same dataset, random seed (`42`), test size (`0.2`), and evaluation threshold (`0.5`).
+
+| Parameter and value | Stages rerun | roc_auc | f1 |
+|---|---|---:|---:|
+| Baseline (`balanced`) | — | 0.7493 | 0.6849 |
+| `class_weight: null` | `train` (`evaluate` restored from cache) | 0.7493 | 0.6987 |
+| `class_weight: balanced` | `train` (`evaluate` skipped) | 0.7493 | 0.6849 |
+
+The `null` value was selected because it achieved a higher F1 score (0.6987) while keeping ROC-AUC unchanged at 0.7493. F1 was sensitive to the class-weight setting, whereas ROC-AUC remained stable. Since the dataset, test split, and random seed were identical across experiments, the results are comparable.

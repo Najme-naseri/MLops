@@ -30,14 +30,15 @@ stages:
       size: 256488
     - path: src/churn/train.py
       hash: md5
-      md5: dc232fe4ae223fbe7ef8cda220f46ad6
-      size: 3871
+      md5: b12354f47bfa06ae2329a47adbb3244b
+      size: 4211
       isexec: true
     params:
       params.yaml:
         train:
           C: 10
           max_iter: 500
+          class_weight:
     outs:
     - path: models/model.joblib
       hash: md5
