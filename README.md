@@ -97,3 +97,26 @@ The `null` value was selected because it achieved a higher F1 score (0.6987) whi
 ## Pipeline Re-execution
 
 Only the `train` stage was rerun because `train.class_weight` is a parameter used by that stage. The `preprocess` stage was skipped because its parameters and dependencies had not changed, and `evaluate` was restored from cache because its inputs had not changed.
+## MLflow
+
+### Run Comparison
+
+| Run (MLflow) | `train.class_weight` | roc_auc | f1 | precision | recall |
+|---|---|---:|---:|---:|---:|
+| Baseline (`141a218a`) | `None` | 0.7493 | 0.6987 | 0.6854 | 0.7124 |
+| `b949534a` | `balanced` | 0.7493 | 0.6849 | 0.6972 | 0.6730 |
+| `fc908d6b` | `{0: 1, 1: 2}` | 0.7490 | **0.7365** | 0.6183 | 0.9105 |
+| `b6bbddc2` | `{0: 1, 1: 3}` | 0.7488 | 0.7222 | 0.5822 | **0.9511** |
+
+### Analysis
+
+The run with `class_weight={0: 1, 1: 2}` achieved the highest F1-score (0.7365), providing the best balance between precision and recall among the experiments. Its recall (0.9105) is significantly higher than the baseline (0.7124), although its precision is lower. The `{0: 1, 1: 3}` configuration achieved the highest recall (0.9511), but its lower precision resulted in a lower F1-score. Therefore, `{0: 1, 1: 2}` was selected as the best configuration for this experiment.
+
+### MLflow Artifacts
+
+The following artifacts were stored in the `s3://mlflow` artifact store for each run:
+
+- `metrics.json`
+- `params.yaml`
+
+The best model was also logged in MLflow as a Logged Model with ID `m-5a2e929910884656a1c3ec30f7110384` and successfully loaded for inference using `mlflow.sklearn.load_model()`.
