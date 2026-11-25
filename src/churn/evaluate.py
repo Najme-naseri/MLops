@@ -37,7 +37,7 @@ import pandas as pd
 import requests
 import yaml
 from mlflow.models import infer_signature
-from sklearn.metrics import f1_score, roc_auc_score
+from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
 
 from churn.preprocess import OUT_DIR, TARGET
 
@@ -48,25 +48,21 @@ EXPERIMENT = "churn"
 
 
 def score(model, df: pd.DataFrame, threshold: float) -> dict:
-    """Compute roc_auc and f1 of `model` on `df` (unchanged since Session 5).
+    """Compute roc_auc, f1, precision and recall of `model` on `df`."""
 
-    roc_auc is computed from the probabilities themselves (no threshold); f1 needs a hard
-    prediction, which we get by comparing the probability with the threshold.
-
-    Args:
-        model: trained model with `predict_proba`.
-        df: test table that includes the target column.
-        threshold: threshold that turns a probability into a 0/1 prediction.
-
-    Returns:
-        A dict `{"roc_auc": ..., "f1": ...}`.
-    """
     X, y = df.drop(columns=[TARGET]), df[TARGET]
-    # The second column of predict_proba = probability that the customer churns.
+
+    # Probability that the customer churns.
     proba = model.predict_proba(X)[:, 1]
+
+    # Convert probabilities to hard predictions using the configured threshold.
+    y_pred = proba > threshold
+
     return {
         "roc_auc": round(roc_auc_score(y, proba), 4),
-        "f1": round(f1_score(y, proba > threshold), 4),
+        "f1": round(f1_score(y, y_pred), 4),
+        "precision": round(precision_score(y, y_pred), 4),
+        "recall": round(recall_score(y, y_pred), 4),
     }
 
 

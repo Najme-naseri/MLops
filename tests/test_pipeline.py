@@ -43,7 +43,7 @@ def test_split_is_reproducible():
 
 
 def test_evaluate_returns_metric_keys():
-    """`score` returns exactly the keys roc_auc and f1, with roc_auc in [0, 1].
+    """`score` returns exactly roc_auc, f1, precision and recall.
 
     This test runs the whole small train-and-evaluate path from start to end. If someone
     renames a metric key, `dvc metrics show` and MLflow (Session 6) break; this test shows
@@ -56,6 +56,6 @@ def test_evaluate_returns_metric_keys():
         train.drop(columns=["churn"]), train["churn"]
     )
     metrics = score(model, test, threshold=0.5)
-    assert set(metrics) == {"roc_auc", "f1"}
+    assert set(metrics) == {"roc_auc", "f1", "precision", "recall"}
     # Python chained comparison: both 0 <= x and x <= 1 must hold.
     assert 0 <= metrics["roc_auc"] <= 1
