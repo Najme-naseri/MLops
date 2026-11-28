@@ -6,3 +6,4 @@ data/raw/churn.csv
 .env
 mlflow.db
 mlruns/
+shap_summary.png
