@@ -14,8 +14,7 @@ train:
   max_iter: 500
   # None keeps the original class weighting behavior
   class_weight:
-    0: 1
-    1: 2
+
 eval:
   # a churn probability above this value counts as "customer will leave"
   threshold: 0.5
