@@ -22,7 +22,12 @@ from churn.train import build_model
 from make_dataset import make
 
 # The same three rules as the `gate` section of params.yaml (values for the tests).
-RULES = {"min_roc_auc": 0.745, "min_f1": 0.69, "max_roc_auc_drop": 0.001}
+RULES = {
+    "min_roc_auc": 0.745,
+    "min_f1": 0.69,
+    "max_roc_auc_drop": 0.001,
+    "max_f1_drop": 0.0,
+}
 
 
 def test_gate_passes_first_model_above_the_floors():
@@ -97,3 +102,19 @@ def test_register_then_promote_moves_the_aliases(one_run):
     assert champion.tags["gate"] == "passed"
     # Tags are always strings, so compare with str(metric).
     assert champion.tags["roc_auc"] == str(metrics["roc_auc"])
+
+
+def test_gate_allows_f1_that_does_not_drop_against_the_champion():
+    """F1 equal to or better than the champion must pass the new F1 rule."""
+    champion = {"roc_auc": 0.7493, "f1": 0.701}
+
+    assert gate({"roc_auc": 0.7490, "f1": 0.701}, champion, RULES) == []
+
+
+def test_gate_blocks_f1_drop_against_the_champion():
+    """A challenger with lower F1 than the champion must fail the new F1 rule."""
+    champion = {"roc_auc": 0.7493, "f1": 0.701}
+
+    failed = gate({"roc_auc": 0.7493, "f1": 0.698}, champion, RULES)
+
+    assert any("f1 0.698 < champion 0.701" in reason for reason in failed)

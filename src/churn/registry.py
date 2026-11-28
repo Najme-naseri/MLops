@@ -200,12 +200,14 @@ def gate(challenger: dict, champion: dict | None, rules: dict) -> list[str]:
     This is the "quality gate". It has nothing to do with MLflow: it only compares a few
     numbers with the rules. That is why it is easy to test without any server.
 
-    It has three rules (the values are in the `gate` section of `params.yaml`):
+    It has four rules (the values are in the `gate` section of `params.yaml`):
     1) `min_roc_auc`: an absolute floor for roc_auc.
     2) `min_f1`: an absolute floor for f1.
     3) `max_roc_auc_drop`: if a champion exists, the roc_auc of the new model must not be
        lower than the champion by more than this value (a tiny drop is fine, a big one
        is not).
+    4) `max_f1_drop`: if a champion exists, the f1 of the new model must not
+     be lower than the champion by more than this value.
 
     Note: f1 can get better while roc_auc gets worse. The gate checks every rule
     separately and returns ALL failures, not only the first one, so you can see
@@ -214,24 +216,40 @@ def gate(challenger: dict, champion: dict | None, rules: dict) -> list[str]:
     Args:
         challenger: metrics of the new model, e.g. {"roc_auc": 0.74, "f1": 0.70}.
         champion: metrics of the current champion, or None if there is none yet.
-        rules: dict with min_roc_auc, min_f1, max_roc_auc_drop.
+        rules: dict with min_roc_auc, min_f1, max_roc_auc_drop, max_f1_drop.
 
     Returns:
         List of human-readable failure messages; an empty list means the gate passed.
     """
     failed = []
+
+    # Rule 1: challenger must meet the minimum ROC-AUC floor.
     if challenger["roc_auc"] < rules["min_roc_auc"]:
         failed.append(f"roc_auc {challenger['roc_auc']} < min_roc_auc {rules['min_roc_auc']}")
+
+    # Rule 2: challenger must meet the minimum F1 floor.
     if challenger["f1"] < rules["min_f1"]:
         failed.append(f"f1 {challenger['f1']} < min_f1 {rules['min_f1']}")
-    if champion is not None:  # the "no regression" rule only makes sense if a champion exists
-        # round(..., 4): avoids float noise such as 0.7482999999 in the comparison
-        floor = round(champion["roc_auc"] - rules["max_roc_auc_drop"], 4)
-        if challenger["roc_auc"] < floor:
+
+    if champion is not None:
+        # Rule 3: challenger ROC-AUC must not drop too much against champion.
+        roc_auc_floor = round(champion["roc_auc"] - rules["max_roc_auc_drop"], 4)
+
+        if challenger["roc_auc"] < roc_auc_floor:
             failed.append(
                 f"roc_auc {challenger['roc_auc']} < champion {champion['roc_auc']}"
                 f" - max_roc_auc_drop {rules['max_roc_auc_drop']}"
             )
+
+        # Rule 4: challenger F1 must not drop too much against champion.
+        f1_floor = round(champion["f1"] - rules["max_f1_drop"], 4)
+
+        if challenger["f1"] < f1_floor:
+            failed.append(
+                f"f1 {challenger['f1']} < champion {champion['f1']}"
+                f" - max_f1_drop {rules['max_f1_drop']}"
+            )
+
     return failed
 
 
