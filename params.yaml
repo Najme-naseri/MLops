@@ -22,3 +22,4 @@ gate:
   min_roc_auc: 0.745
   min_f1: 0.69
   max_roc_auc_drop: 0.001
+  max_f1_drop: 0.0
